@@ -1,0 +1,41 @@
+name: CI - Basic
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    name: Build & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: |
+          if [ -f package.json ]; then
+            npm ci
+          else
+            echo "No package.json — skipping npm install"
+          fi
+
+      - name: Run tests
+        run: |
+          if [ -f package.json ]; then
+            if npm test --silent; then
+              echo "Tests passed"
+            else
+              echo "Tests failed"; exit 1
+            fi
+          else
+            echo "No tests to run — finished"
+          fi
